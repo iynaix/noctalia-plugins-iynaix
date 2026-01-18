@@ -16,18 +16,19 @@ Item {
   property string supportedLayouts: "list"
   property bool supportsAutoPaste: false
 
-  // Projects
   readonly property string projectDir: pluginApi?.pluginSettings?.projectDir ||
                                        pluginApi?.manifest?.metadata?.defaultSettings?.projectDir ||
                                        "~/Documents"
+  readonly property string openCommand: pluginApi?.pluginSettings?.openCommand ||
+                                       pluginApi?.manifest?.metadata?.defaultSettings?.openCommand ||
+                                       "nvim %s"
 
   property var projects: []
-  property bool loaded: false
   property bool loading: false
 
   // Load projects on init
   function init() {
-    if (pluginApi && pluginApi.pluginDir && !loading && !loaded) {
+    if (pluginApi && pluginApi.pluginDir && !loading) {
       loading = true;
       projectsScanner.running = true;
     }
@@ -44,7 +45,6 @@ Item {
 
     onExited: function (exitCode) {
       loading = false;
-      loaded = true;
 
       if (exitCode !== 0) {
         Logger.e("ProjectsProvider", "Scan failed with code: " + exitCode);
@@ -60,7 +60,7 @@ Item {
         };
       });
 
-      Logger.i("ProjectsProvider", "Projects loaded,", root.projects.length, "entries");
+      Logger.i("ProjectsProvider", "Projects loaded: ", root.projects.length, "entries");
     }
   }
 
@@ -94,17 +94,6 @@ Item {
         "name": "Loading...",
         "description": "Loading projects...",
         "icon": "refresh",
-        "isTablerIcon": true,
-        "isImage": false,
-        "onActivate": function() {}
-      }];
-    }
-
-    if (!loaded) {
-      return [{
-        "name": "Projects not loaded",
-        "description": "Try reopening the launcher",
-        "icon": "alert-circle",
         "isTablerIcon": true,
         "isImage": false,
         "onActivate": function() {
@@ -152,7 +141,9 @@ Item {
       "hideIcon": false,         // No icon needed in list view
       "singleLine": true,
       "onActivate": function() {
-        Quickshell.execDetached(["sh", "-c", "codium '" + directory + "'"]);
+        let cmd = root.openCommand.replace('"%s"', "'" + directory + "'").replace("%s", "'" + directory + "'");
+
+        Quickshell.execDetached(["sh", "-c", cmd]);
         launcher.close();
       }
     };

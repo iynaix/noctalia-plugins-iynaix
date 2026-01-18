@@ -17,7 +17,8 @@
   },
   "metadata": {
     "defaultSettings": {
-      "projectDir": "~/Documents"
+      "projectDir": "~/Documents",
+      "openCommand": "nvim %s"
     }
   }
 }
