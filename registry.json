@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "plugins": [
+    {
+      "id": "projects-provider",
+      "name": "Projects Provider",
+      "version": "1.0.0",
+      "description": "Browse and open projects in the editor",
+      "tags": ["Launcher", "Utility", "Development"],
+      "minNoctaliaVersion": "3.9.0",
+      "author": "iynaix",
+      "license": "MIT",
+      "repository": "https://github.com/iynaix/noctalia-plugins-iynaix"
+    }
+  ]
+}
