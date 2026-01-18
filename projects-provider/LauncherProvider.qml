@@ -17,7 +17,10 @@ Item {
   property bool supportsAutoPaste: false
 
   // Projects
-  readonly property string projectDir: "%PROJECT_DIR%" // actual value will be substituted in by nix
+  readonly property string projectDir: pluginApi?.pluginSettings?.projectDir ||
+                                       pluginApi?.manifest?.metadata?.defaultSettings?.projectDir ||
+                                       "~/Documents"
+
   property var projects: []
   property bool loaded: false
   property bool loading: false
@@ -34,7 +37,7 @@ Item {
     id: projectsScanner
     command: [
       "sh", "-c",
-      "find '" + projectDir + "' -mindepth 1 -maxdepth 1 -type d | sort -f"
+      "find \"" + root.projectDir.replace("~", "$HOME") + "\" -mindepth 1 -maxdepth 1 -type d | sort -f"
     ]
     running: false
     stdout: StdioCollector {}
@@ -50,8 +53,7 @@ Item {
 
       var output = String(stdout.text || "");
       var projectDirs = output.trim().split('\n').forEach(function (dir) {
-        var proj = dir.replace(projectDir, "");
-        proj = proj.replace(/^\/+/g, ""); // replace leading slashes
+        var proj = dir.split("/").pop();
 
         if (proj.length > 0) {
           root.projects.push({name: proj, directory: dir});
