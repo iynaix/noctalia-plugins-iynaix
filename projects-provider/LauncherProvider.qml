@@ -44,21 +44,24 @@ Item {
     stdout: StdioCollector {}
 
     onExited: function (exitCode) {
-      loading = false;
-
       if (exitCode !== 0) {
+        root.loading = false;
         Logger.e("ProjectsProvider", "Scan failed with code: " + exitCode);
         return;
       }
 
       var output = String(stdout.text || "");
-      var projectDirs = output.trim().split('\n').forEach(function (dir) {
+      var projectDirs = [];
+      output.trim().split('\n').forEach(function (dir) {
         var proj = dir.split("/").pop();
 
         if (proj.length > 0) {
-          root.projects.push({name: proj, directory: dir});
+          projectDirs.push({name: proj, directory: dir});
         };
       });
+
+      root.projects = projectDirs;
+      root.loading = false;
 
       Logger.i("ProjectsProvider", "Projects loaded: ", root.projects.length, "entries");
     }

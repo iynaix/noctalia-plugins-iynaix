@@ -9,18 +9,14 @@ Item {
     target: "plugin:projects"
     function toggle() {
       pluginApi.withCurrentScreen(screen => {
-        var launcherPanel = PanelService.getPanel("launcherPanel", screen);
-        if (!launcherPanel)
-          return;
-        var searchText = launcherPanel.searchText || "";
+        var searchText = PanelService.getLauncherSearchText(screen);
         var isInProjectsMode = searchText.startsWith(">pj") || searchText.startsWith(">projects ");
-        if (!launcherPanel.isPanelOpen) {
-          launcherPanel.open();
-          launcherPanel.setSearchText(">pj ");
+        if (!PanelService.isLauncherOpen(screen)) {
+          PanelService.openLauncherWithSearch(screen, ">pj ");
         } else if (isInProjectsMode) {
-          launcherPanel.close();
+          PanelService.closeLauncher(screen);
         } else {
-          launcherPanel.setSearchText(">pj ");
+          PanelService.setLauncherSearchText(screen, ">pj ");
         }
       });
     }
