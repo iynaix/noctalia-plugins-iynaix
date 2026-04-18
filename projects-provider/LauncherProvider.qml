@@ -16,9 +16,9 @@ Item {
   property string supportedLayouts: "list"
   property bool supportsAutoPaste: false
 
-  readonly property string projectDir: pluginApi?.pluginSettings?.projectDir ||
-                                       pluginApi?.manifest?.metadata?.defaultSettings?.projectDir ||
-                                       "~/Documents"
+  readonly property list<string> projectDirs: pluginApi?.pluginSettings?.projectDirs ||
+                                                pluginApi?.manifest?.metadata?.defaultSettings?.projectDirs ||
+                                                ["~/Documents"]
   readonly property string openCommand: pluginApi?.pluginSettings?.openCommand ||
                                        pluginApi?.manifest?.metadata?.defaultSettings?.openCommand ||
                                        "nvim %s"
@@ -38,7 +38,9 @@ Item {
     id: projectsScanner
     command: [
       "sh", "-c",
-      "find \"" + root.projectDir.replace("~", "$HOME") + "\" -mindepth 1 -maxdepth 1 -type d | sort -f"
+      "find " + root.projectDirs.map(function (projectDir) {
+        return '"' + projectDir.replace("~", "$HOME") + '"';
+      }).join(" ") + " -mindepth 1 -maxdepth 1 -type d -exec test -d \"{}/.git\" \\; -print 2>/dev/null | sort -f"
     ]
     running: false
     stdout: StdioCollector {}
